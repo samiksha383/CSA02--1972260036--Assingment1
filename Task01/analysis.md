@@ -1,19 +1,15 @@
-#include <stdio.h>
-#include <limits.h>
+# TASK 1 – Problem Analysis and Data Identification
 
-/* The meter register is a 16-bit counter: after 65535 it rolls over to 0. */
-typedef unsigned short meter_t;
+### 1. Justified System Data Inventory
+* **household_number:** Stored as `unsigned int` to support district scale (800,000 houses).
+* **category:** Stored as a single `char` flag for discrete classification codes.
+* **previous_reading / current_reading:** Stored as `unsigned short` to match physical 16-bit utility meter loops.
+* **units_consumed:** Stored as `unsigned int` to hold cumulative calculation deltas.
+* **fixed_charge / energy_charge / total_bill:** Stored as `long` in whole Indian Paise to prevent rounding precision drift.
 
-unsigned int consumption(meter_t previous, meter_t current) {
-    // TODO 1: Return the units consumed, correct even when the register has rolled over
-    // (current < previous); use unsigned 16-bit arithmetic instead of an if-else
-    return (unsigned short)(current - previous);
-}
+### 2. Operational Rules
+* **Non-Negativity Rule:** Total Bill >= Fixed Charge.
+* **Conservation of Value:** Total Bill = Fixed Charge + Energy Charge.
 
-int main(void) {
-    printf("sizeof(meter_t) = %zu bytes, maximum reading = %u\n", sizeof(meter_t), (unsigned)USHRT_MAX);
-    printf("Consumption: %u units\n", consumption(1200, 1530));
-    printf("Consumption: %u units\n", consumption(65400, 120)); /* rolled over */
-    return 0;
-}
-
+### 3. Alternative Concept Analysis
+If stored as text strings (e.g., "01530"), checking and converting data requires O(d) linear digit parsing time and consumes 6 bytes of space instead of 2 bytes, causing a 200% memory overhead at scale.
